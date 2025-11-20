@@ -1,0 +1,182 @@
+/* =========================
+   全域設定
+========================= */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Noto Sans TC", sans-serif;
+    background: #f5f2e9; /* 禪風米色 */
+    color: #333;
+}
+
+/* 隱藏畫面時使用 */
+.screen.hidden {
+    display: none;
+}
+
+/* 兩個主畫面 */
+.screen {
+    text-align: center;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* =========================
+   開始畫面 UI
+========================= */
+h1, h2 {
+    color: #5a463a; /* 禪風深棕 */
+}
+
+.setting-box {
+    margin: 20px auto;
+    padding: 10px;
+    width: 250px;
+    background: #fffaf3;
+    border: 1px solid #d9c9a9;
+    border-radius: 8px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+input {
+    width: 120px;
+    padding: 5px;
+    font-size: 18px;
+    border-radius: 6px;
+    border: 1px solid #c0b79f;
+    text-align: center;
+}
+
+#start-btn {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 20px;
+    background: #a68f6a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#start-btn:hover {
+    background: #8b7a5d;
+}
+
+
+/* =========================
+   遊戲控制面板
+========================= */
+#control-panel {
+    margin: 20px auto;
+    padding: 0px;
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#timer-box {
+    font-size: 22px;
+    background: #fff6e5;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid #d3c3a8;
+}
+
+#hint-btn {
+    padding: 10px 20px;
+    font-size: 18px;
+    background: #c9b78f;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#hint-btn:hover {
+    background: #b4a178;
+}
+
+
+/* =========================
+   卡牌 Grid（14 × 22）
+========================= */
+
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(22, 1fr);
+    grid-template-rows: repeat(14, 1fr); /* 14 行平均高度 */
+    gap: 5px;
+    width: 80%;
+    height: 300px; /* 明確高度 */
+    margin: 0 auto;
+}
+/* 保持正方形，可以調整 aspect-ratio 或改用 inner 元素做置中 */
+
+
+/* =========================f
+   卡牌樣式（翻牌 3D）
+========================= */
+.card {
+    width: 100%;
+    padding-top: 100%;  /* 保持正方形 */
+    position: relative;
+    perspective: 800px;
+    cursor: pointer;
+}
+
+
+.card-inner {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+}
+
+.card.flip .card-inner {
+    transform: rotateY(180deg);
+}
+
+/* 正面與背面 */
+.card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+}
+
+/* 背面 */
+.card-back {
+    background: #b7a98e; /* 禪風木色 */
+    color: white;
+}
+
+/* 正面 */
+.card-front {
+    transform: rotateY(180deg);
+    background: #fffdf8;
+    border: 1px solid #d1c4a3;
+}
+
+/* 配對成功 */
+.card.matched .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card.matched {
+    filter: brightness(1.2);
+    border: 2px solid #8c7b60;
+}
