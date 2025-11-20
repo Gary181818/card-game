@@ -40,6 +40,8 @@ let countdownTimer = null;
 // 原文字庫（可換）
 let rawText = `
 梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+`.replace(/[^\u4e00-\u9fff]/g, "");
+let rawText2 = `
 森羅萬象終歸壞唯有真空才不滅青色白色皆對待不落兩邊非生滅
 青色白色皆真性春風滿園露禪悅
 `.replace(/[^\u4e00-\u9fff]/g, "");
@@ -56,9 +58,16 @@ function shuffle(arr) {
 // 產生 308 張字卡
 function buildCardPool() {
   let base = rawText.split("");
+  let base2 = rawText2.split("");
   let pool = [];
 
-  base.forEach(ch => pool.push(ch, ch)); // 每字兩份
+  base.forEach(ch => {
+    for (let i = 0; i < 8; i++) {
+      pool.push(ch);
+    }
+  }); // 每字八份
+  base2.forEach(ch => pool.push(ch, ch)); // 每字兩份
+  console.log(pool);
 
   // 若不足 308 → 倍增補足
   while (pool.length < TOTAL_CARDS) {
