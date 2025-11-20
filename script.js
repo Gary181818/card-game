@@ -34,6 +34,7 @@ let lockBoard = true;
 let firstCard = null;
 let secondCard = null;
 let matchedCount = 0;
+let step = 0; //答題階段
 
 let countdownTimer = null;
 
@@ -42,9 +43,11 @@ let rawText = `
 梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
 `.replace(/[^\u4e00-\u9fff]/g, "");
 let rawText2 = `
-森羅萬象終歸壞唯有真空才不滅青色白色皆對待不落兩邊非生滅
-青色白色皆真性春風滿園露禪悅
+森羅萬象終歸壞唯有真空才不滅青色白色皆對待不落兩邊非生滅青色白色皆真性春風滿園露禪悅
 `.replace(/[^\u4e00-\u9fff]/g, "");
+
+// 原文順序
+let answer = `梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色森羅萬象終歸壞唯有真空才不滅梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色青色白色皆對待不落兩邊非生滅梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色青色白色皆真性春風滿園露禪悅`
 
 // Fisher-Yates 洗牌
 function shuffle(arr) {
@@ -159,12 +162,27 @@ function onCardClick(card) {
   if (card.classList.contains("flip")) return;
   if (card.classList.contains("matched")) return;
 
-  card.classList.add("flip");
-
   if (!firstCard) {
     firstCard = card;
     return;
   }
+
+  // 先檢查順序（第一張也會檢查）
+  if (!checkSequence()) {
+    // 順序不對 → 翻開給玩家看一下 → 蓋回去
+    card.classList.add("flip");
+
+    setTimeout(() => {
+      firstCard = null;
+      card.classList.remove("flip");
+      lockBoard = false;
+    }, 800);
+
+    return; // 結束，不進入配對流程
+  }
+
+  // 順序正確，進入原本配對流程
+  card.classList.add("flip");
 
   // 避免點同一張
   if (firstCard === card) return;
@@ -173,6 +191,11 @@ function onCardClick(card) {
   lockBoard = true;
 
   checkMatch();
+}
+
+function checkSequence() {
+  const match = firstCard.dataset.char === answer.charAt(step)
+  return match;
 }
 
 function checkMatch() {
@@ -189,6 +212,8 @@ function checkMatch() {
     firstCard = null;
     secondCard = null;
     lockBoard = false;
+
+    step += 1;
 
     if (matchedCount >= TOTAL_CARDS) {
       setTimeout(() => alert("恭喜！全部配對完成！"), 300);
