@@ -181,6 +181,7 @@ function onCardClick(card) {
     return; // 結束，不進入配對流程
   }
 
+  lockBoard = false;
   // 順序正確，進入原本配對流程
   card.classList.add("flip");
 
@@ -194,6 +195,7 @@ function onCardClick(card) {
 }
 
 function checkSequence() {
+  lockBoard = true;
   const match = firstCard.dataset.char === answer.charAt(step)
   return match;
 }
