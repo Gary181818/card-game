@@ -54,22 +54,6 @@ input {
     text-align: center;
 }
 
-#start-btn {
-    margin-top: 20px;
-    padding: 12px 25px;
-    font-size: 20px;
-    background: #a68f6a;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-#start-btn:hover {
-    background: #8b7a5d;
-}
-
 
 /* =========================
    遊戲控制面板
@@ -81,6 +65,10 @@ input {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+#score-baord {
+    font-size: 22px;
 }
 
 #timer-box {
@@ -162,13 +150,16 @@ input {
 .card-back {
     background: #b7a98e; /* 禪風木色 */
     color: white;
+    font-size: 30px;
 }
 
 /* 正面 */
 .card-front {
     transform: rotateY(180deg);
+    white-space: pre-line;
     background: #fffdf8;
     border: 1px solid #d1c4a3;
+    font-size: 30px;
 }
 
 /* 配對成功 */
