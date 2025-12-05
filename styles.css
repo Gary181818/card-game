@@ -150,7 +150,7 @@ input {
 .card-back {
     background: #b7a98e; /* 禪風木色 */
     color: white;
-    font-size: 30px;
+    font-size: 25px;
 }
 
 /* 正面 */
@@ -159,7 +159,7 @@ input {
     white-space: pre-line;
     background: #fffdf8;
     border: 1px solid #d1c4a3;
-    font-size: 30px;
+    font-size: 25px;
     line-height: 1.4;
 }
 
