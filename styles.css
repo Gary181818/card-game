@@ -9,109 +9,139 @@ body {
     color: #333;
 }
 
+#game-screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 /* 隱藏畫面時使用 */
 .screen.hidden {
     display: none;
 }
 
-/* 兩個主畫面 */
 .screen {
     text-align: center;
-    padding: 20px;
-    height: 100vh;
     box-sizing: border-box;
-    overflow: auto;
 }
 
 /* =========================
-   開始畫面 UI
+   Header 樣式
 ========================= */
 h1, h2 {
     color: #5a463a; /* 禪風深棕 */
+    margin: 0;
+    padding-bottom: 10px;
 }
-
-.setting-box {
-    margin: 20px auto;
-    padding: 10px;
-    width: 250px;
-    background: #fffaf3;
-    border: 1px solid #d9c9a9;
-    border-radius: 8px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 18px;
-}
-
-input {
-    width: 120px;
-    padding: 5px;
-    font-size: 18px;
-    border-radius: 6px;
-    border: 1px solid #c0b79f;
-    text-align: center;
-}
-
 
 /* =========================
-   遊戲控制面板
+   主佈局：左欄控制面板 + 右側卡牌
 ========================= */
-#control-panel {
-    margin: 20px auto;
-    padding: 0px;
-    width: 90%;
+#main-layout {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: row;
+    flex: 1;          /* ✅ 自動吃滿 header 下面的空間 */
+    min-height: 0;   /* ✅ 防止 grid 被撐爆 */
 }
 
-#score-baord {
-    font-size: 22px;
+/* =========================
+   左欄控制面板
+========================= */
+#control-panel {
+    width: 260px;
+    padding: 26px 22px;
+    background: linear-gradient(180deg, #f7f2ea, #efe6d8);
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    border: 1px solid rgba(120, 90, 40, 0.2);
 }
 
 #timer-box {
-    font-size: 22px;
-    background: #fff6e5;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 1px solid #d3c3a8;
+    background: #ad8351;
+    color: #f3ede2;
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
+#timer {
+    color: #ec0101;
+    font-size: 28px;
+    margin: 0 6px;
+}
 #hint-btn {
-    padding: 10px 20px;
-    font-size: 18px;
-    background: #c9b78f;
+    padding: 14px;
+    border-radius: 14px;
     border: none;
-    border-radius: 8px;
+
+    background: linear-gradient(135deg, #6b8f71, #4f6f59);
+    color: #f7f2ea;
+    font-size: 16px;
+    font-weight: bold;
+
     cursor: pointer;
-    transition: 0.2s;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #hint-btn:hover {
-    background: #b4a178;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
+#hint-btn:active {
+    transform: scale(0.96);
+}
+
+#score-baord {
+    background: #cece5a;
+    padding: 14px;
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+#score {
+    color: #3f4ed2;
+    font-size: 22px;
+    margin-left: 6px;
+}
 
 /* =========================
-   卡牌 Grid（14 × 22）
+   右側卡牌 Grid
 ========================= */
 
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(22, 1fr);
-    grid-template-rows: repeat(14, 1fr); /* 14 行平均高度 */
-    gap: 5px;
-    width: 80%;
-    height: 300px; /* 明確高度 */
-    margin: 0 auto;
+.grid-wrapper {
+    flex: 1; /* 撐滿右側剩餘空間 */
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    align-items: center;     /* 垂直置中 */
 }
-/* 保持正方形，可以調整 aspect-ratio 或改用 inner 元素做置中 */
 
+#grid {
+    flex: 1;
+    margin: 20px;
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 6px;
 
-/* =========================f
+    max-width: 1100px;
+    overflow-y: auto;     /* ✅ 只讓卡牌區滑動 */
+    align-content: start;
+}
+/* =========================
    卡牌樣式（翻牌 3D）
 ========================= */
 .card {
@@ -121,7 +151,6 @@ input {
     perspective: 800px;
     cursor: pointer;
 }
-
 
 .card-inner {
     position: absolute;
@@ -171,4 +200,28 @@ input {
 .card.matched {
     filter: brightness(1.2);
     border: 2px solid #8c7b60;
+}
+
+/* =========================
+   手機響應式
+========================= */
+@media (max-width: 768px) {
+    #main-layout {
+        flex-direction: column;
+    }
+
+    #control-panel {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        margin-bottom: 10px;
+        border-right: none;
+        border-bottom: 2px solid #d3c3a8;
+    }
+
+    #grid {
+        margin: 0 10px;
+        max-width: 100%;
+        max-height: none;
+    }
 }

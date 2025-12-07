@@ -8,31 +8,37 @@
 </head>
 
 <body>
-    <!-- =======================
-         Game Screen（遊戲介面）
-         ======================= -->
     <div id="game-screen" class="screen hidden">
 
         <header>
             <h2>禪詩翻牌考驗</h2>
         </header>
 
-        <div id="control-panel">
+        <!-- ✅ 新增：左右排列的容器 -->
+        <div id="main-layout">
 
-            <div id="timer-box">
-                倒數 <span id="timer">10</span> 秒
+            <!-- ✅ 左欄：控制區 -->
+            <div id="control-panel">
+                <div id="timer-box">
+                    倒數 <span id="timer">10</span> 秒
+                </div>
+
+                <div id="score-baord">
+                    成績 <span id="score">0</span> 分
+                </div>
+                
+                <button id="hint-btn">
+                    開始遊戲
+                </button>
+                
+                
             </div>
-            
-            <div id="score-baord">
-                分數： <span id="score">0</span>
+
+            <!-- ✅ 右欄：卡牌區 -->
+            <div class="grid-wrapper">
+                <div id="grid" class="grid"></div>
             </div>
-
-            <button id="hint-btn">
-                開始遊戲
-            </button>
-
         </div>
-        <div id="grid" class="grid"></div>
 
     </div>
 
