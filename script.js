@@ -20,6 +20,10 @@ const grid = document.getElementById("grid");
 const startBtn = document.getElementById("start-btn");
 const scoreBoard = document.getElementById("score")
 
+const hintBoard = document.getElementById("hint-board");
+const MAX_HINTS = 14;
+
+
 
 // 遊戲變數
 let cardPool = [];
@@ -74,6 +78,20 @@ function buildCardPool() {
   shuffle(pool);
 
   return pool;
+}
+
+let currentHintIndex = 0;
+
+function initHintBoard() {
+    hintBoard.innerHTML = "";
+    currentHintIndex = 0;
+
+    for (let i = 0; i < MAX_HINTS; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("hint-cell");
+        cell.textContent = ""; // 初始空白
+        hintBoard.appendChild(cell);
+    }
 }
 
 // 建立 DOM 卡牌
@@ -160,7 +178,7 @@ function onCardClick(card) {
     }, 800);
     return; // 結束，不進入配對流程
   }
-
+  
   card.classList.add("matched");
   score++;
   step++;
@@ -231,6 +249,8 @@ if (document.documentElement.requestFullscreen) {
 
 cardPool = buildCardPool();
 buildBoard();
+initHintBoard();
+
 
 matchedCount = 0;
 firstCard = null;
