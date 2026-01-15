@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>靜心木魚 - 禪詩翻牌考驗</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div id="game-screen">
+
+        <div id="main-layout">
+
+            <!-- 左側：控制面板 -->
+            <div id="control-panel">
+                <header>
+                    <h2>禪詩翻牌考驗</h2>
+                </header>
+
+                <div class="info-box">
+                    <p>剩餘時間</p>
+                    <span id="timer">60</span>
+                </div>
+
+                <div class="info-box">
+                    <p>提示次數</p>
+                    <span id="hints-left">3</span>
+                </div>
+
+                <button id="start-btn">開始遊戲</button>
+            </div>
+
+            <!-- 右側：遊戲區 -->
+            <div id="game-panel">
+                <div class="grid-wrapper">
+                    <div id="grid"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

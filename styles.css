@@ -92,17 +92,21 @@ h1, h2 {
 ========================= */
 #timer-box {
     background: #ebe6da;
-    width: 65%;
+    width: 50%;
     height: 100%;
     border-radius: 14px;
     font-size: 17px;
     font-weight: bold;
     letter-spacing: 1px;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #timer {
     color: #2f2b25;
-    font-size: 90px;
+    font-size: 70px;
     margin: 0 6px;
 }
 
@@ -118,24 +122,31 @@ h1, h2 {
     background: var(--bg-wood);
     border-radius: 15px;
     aspect-ratio: 1 / 1;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 #score {
-    color: var(--accent-green-dark);
+    color: #2f2b25;
     font-size: 60px;
     margin-left: 6px;
     padding-bottom: 10px;
 }
 
 /* =========================
-   進度條
+   進度區
 ========================= */
-#progress-bar {
-    background: #a9a393;
-    width: 100%;
-    height: 10%;
-    border-radius: 15px;
+#progress-board {
+    display: flex;
+    justify-content: space-between; /* 左右貼齊 */
+    align-items: center;            /* 垂直置中 */
+    font-size: 23px;
+    font-weight: bold;
 }
+
+
+
 
 
 
@@ -144,30 +155,27 @@ h1, h2 {
 ========================= */
 #hint-board {
     background: var(--accent-green);
-    width: 100%;
-    height: 60%;
     border-radius: 15px;
     font-size: 17px;
     font-weight: bold;
     letter-spacing: 1px;
-    color: #2f3b35;
+    color: lab(23.64% -6.44 2.07);
+    
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: repeat(2, 1fr);
 
     align-items: center;
     justify-content: center;
-    padding-bottom: 10px;
-
 }
 
 
 .hint-cell {
-    height: 70%;
-    width: 60%;
+    aspect-ratio: 1 / 1;
+    margin: 9px;
     background-color: #e6e0d4;
     border: 2px solid #b8aa95;
-    border-radius: 6px;
+    border-radius: 10px;
 
     font-size: 24px;
     font-weight: bold;
@@ -176,6 +184,10 @@ h1, h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 /* =========================
@@ -184,16 +196,49 @@ h1, h2 {
 #interact-box {
     width: 100%;
     height: 70%;
+    position: relative;
+
     display: flex;
-    background: #b8b2a6;
-    color: #2f2b25;
-    border-radius: 14px;
+    justify-content: center; /* 水平置中 */
+    align-items: center;     /* 垂直置中 */
+
+    background: linear-gradient(
+        180deg,
+        #c9c4b8,
+        #b8b2a6
+    );
+
+    border-radius: 18px;
+    overflow: hidden;
 }
 
+
+#dialog-box {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    max-width: 500px;
+    padding: 15px 20px;
+
+    background: #fffdf8;
+    border: 2px solid #b7a98e;
+    border-radius: 14px;
+
+    font-size: 18px;
+    line-height: 1.5;
+    color: #4a4036;
+    font-weight: bold;
+
+    z-index: 10;
+}
+
+
 #image {
-    display: flex;
+    display: block;
     width: auto;
-    height: 50%;
+    height: 100%;
+    justify-content: center;
 }
 
 /* =========================
@@ -363,3 +408,4 @@ h1, h2 {
         max-width: 100%;
     }
 }
+

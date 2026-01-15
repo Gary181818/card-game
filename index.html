@@ -8,64 +8,62 @@
 </head>
 
 <body>
-    <div id="game-screen" class="screen hidden">
-       
-        <!-- ✅ 新增：左右排列的容器 -->
-        <div id="main-layout">
 
-            <!-- ✅ 左欄：控制區 -->
-            <div id="control-panel">
-                <header>
-                    <h2>禪詩翻牌考驗</h2>
-                </header>
-                <div id="row1">
-                    <div id="timer-box">
-                        <span id="timer">20:00</span> 
-                    </div>
-                    <div id="info-box">
-                        分數
-                        <div id="score">0</div>
-                    </div>
-                        
-                </div>
-                
-                <div id="hint-board">
-                    
+<div id="game-screen" class="screen">
+    <!-- 主布局 -->
+    <div id="main-layout">
+
+        <!-- 左欄：控制區 -->
+        <div id="control-panel">
+
+            <header>
+                <h2>禪詩翻牌考驗</h2>
+            </header>
+
+            <div id="row1">
+                <div id="timer-box">
+                    剩餘時間
+                    <span id="timer">
+                        <span id="timer-min">20</span>:<span id="timer-ms">00</span>
+                    </span>
                 </div>
 
-
-                <div id="interact-box">
-                    
-                    <img id="image" src="video.gif" alt="Meditation Image">
+                <div id="info-box">
+                    分數
+                    <div id="score">0</div>
                 </div>
-                
-                
-
-                <button id="hint-btn">
-                    開始遊戲
-                </button>
-                
-                
             </div>
 
-            <!-- ✅ 右欄：卡牌區 -->
-            <div id="game-panel">
-      
-                <div class="grid-wrapper">
-                     <div id="grid" class="grid">
-                        <div id="card-grid">
-                            <script src="script.js"></script>
-                        </div>
-                    </div>
-                <div>
+            <div id="hint-board"></div>
+
+            <div id="progress-board">
+                <span class="label">已完成進度</span>
+                <span class="value">
+                    <span id="progress">0</span>/154
+                </span>
             </div>
-                
+
+            <div id="interact-box">
+                <img id="image" src="./image/idle.gif" alt="monk">
+                <div id="dialog-box">準備開始囉。</div>
             </div>
-            <div> 
+
+            <button id="hint-btn">開始遊戲</button>
+
+        </div>
+
+        <!-- 右欄：卡牌區 -->
+        <div id="game-panel">
+            <div class="grid-wrapper">
+                <div id="grid" class="grid">
+                    <!-- JS 產生卡牌 -->
+                </div>
+            </div>
         </div>
 
     </div>
+</div>
 
-    
+<script src="script.js"></script>
 </body>
 </html>
