@@ -125,13 +125,56 @@ h1, h2 {
     font-size: 17px;
     font-weight: bold;
     letter-spacing: 1px;
+    position: relative;
 }
 
 #score {
+    position: relative;
     color: #2f2b25;
     font-size: 60px;
     margin-left: 6px;
     padding-bottom: 10px;
+}
+/* =========================
+   分數浮動提示
+========================= */
+
+.score-popup {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    font-weight: bold;
+    pointer-events: none;
+    opacity: 0;
+    animation: scoreFloat 1.2s ease-out forwards;
+}
+
+.score-popup.plus {
+    color: #4f7f55; /* 禪風綠 */
+}
+
+.score-popup.minus {
+    color: #b85c4a; /* 禪風紅 */
+}
+
+.score-popup.bonus {
+    color: #c49a3a; /* 金色 */
+}
+
+@keyframes scoreFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
 }
 
 /* =========================
@@ -144,10 +187,6 @@ h1, h2 {
     font-size: 23px;
     font-weight: bold;
 }
-
-
-
-
 
 
 /* =========================
@@ -189,6 +228,14 @@ h1, h2 {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.hint-cell.current{
+    background: linear-gradient(135deg, #c8b48a, #e8dcc4);
+    color: #4a3a1f;
+    font-weight: bold;
+    box-shadow: 0 0 0 2px rgba(120, 90, 40, 0.4) inset;
+}
+
 
 /* =========================
    互動區（小和尚）
@@ -305,7 +352,7 @@ h1, h2 {
     gap: 6px;
 
     max-width: 1100px;
-    margin: 20px;
+    margin: 25px;
 
     justify-items: center;
     overflow-y: auto;
@@ -385,6 +432,43 @@ h1, h2 {
 
 .card.matched .card-inner {
     transform: rotateY(180deg);
+}
+
+
+#result-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.result-box {
+    background: #f7f3ea;
+    padding: 40px 60px;
+    border-radius: 20px;
+    text-align: center;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: popIn 0.6s ease forwards;
+}
+
+@keyframes popIn {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.bonus {
+    color: #c94f4f;
+    font-size: 20px;
+}
+
+.final {
+    margin-top: 20px;
+    font-size: 36px;
+    color: #5a463a;
 }
 
 /* =========================
