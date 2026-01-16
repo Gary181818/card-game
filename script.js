@@ -1,313 +1,353 @@
-// =============================
-// GameConfig
-// =============================
-const GameConfig = {
-    ROWS: 11,
-    COLS: 14,
-    TOTAL_CARDS: 154,
-    MAX_HINTS: 14,
+// -----------------------------
+// script.js（純單人完整版）
+// -----------------------------
 
-    NORMAL_TIME: 20 * 60,
-    INITIAL_PREVIEW: 15,
+/* ========= 遊戲設定 ========= */
+const TOTAL_ROWS = 11;
+const TOTAL_COLS = 14;
+const TOTAL_CARDS = TOTAL_ROWS * TOTAL_COLS; // 154
+const MAX_HINTS = 14;
 
-    SCORE_BASE: 10,
-    SCORE_COMBO: 2,
-};
+const NORMAL_TIME = 20 * 60 // 20 分鐘
+const HINT_TIME = 10;        // 10 秒
+const INITIAL_PREVIEW = 15;  // 開局偷看 15 秒
 
-// =============================
-// GameState
-// =============================
-const GameState = {
-    started: false,
-    finished: false,
-    locked: true,
+/* ========= DOM ========= */
+const gameScreen = document.getElementById("game-screen");
+const hintBtn = document.getElementById("hint-btn");
+const grid = document.getElementById("grid");
+const scoreBoard = document.getElementById("score");
+const progress = document.getElementById("progress");
+const hintBoard = document.getElementById("hint-board");
+const image = document.getElementById("image");
+const result = document.getElementById("result-screen");    
 
-    step: 0,
-    score: 0,
-    bonus: 0,
-    finalScore: 0,
+/* ========= 遊戲狀態 ========= */
+let cardPool = [];
+let cardElements = [];
 
-    combo: 0,
-    mistakes: 0,
-    usedHints: 0,
+let lockBoard = true;
+let score = 0;
+let bonus = 0;
 
-    remainingSeconds: GameConfig.NORMAL_TIME,
-};
 
-// =============================
-// DOM / UI
-// =============================
-const UI = {
-    gameScreen: document.getElementById("game-screen"),
-    grid: document.getElementById("grid"),
-    score: document.getElementById("score"),
-    progress: document.getElementById("progress"),
-    hintBoard: document.getElementById("hint-board"),
-    image: document.getElementById("image"),
-    hintBtn: document.getElementById("hint-btn"),
-    result: document.getElementById("result-screen"),
+let finalScore = score + bonus;
 
-    timerMin: document.getElementById("timer-min"),
-    timerSec: document.getElementById("timer-ms"),
+let combo = 0;
+let usedHints = 0;
+let mistakeCount = 0;
 
-    updateScore(value) {
-        this.score.textContent = value;
-    },
+let step = 0;
+let hintRemaining = 10;
 
-    updateProgress(value) {
-        this.progress.textContent = value;
-    },
+let gameStarted = false;
+let gameFinished = false;
 
-    updateTimer(seconds) {
-        this.timerMin.textContent = String(Math.floor(seconds / 60)).padStart(2, "0");
-        this.timerSec.textContent = String(seconds % 60).padStart(2, "0");
-    },
+/* ========= Timer ========= */
+let timerInterval = null;
+let remainingSeconds = 20 * 60; // 20 分鐘
+let initialPeekSeconds = 15; // 開局偷看 15 秒
 
-    showScorePopup(text, type) {
-        const box = document.getElementById("info-box");
-        const el = document.createElement("div");
-        el.className = `score-popup ${type}`;
-        el.textContent = text;
-        box.appendChild(el);
-        setTimeout(() => el.remove(), 1200);
-    },
+/* ========= 題庫 ========= */
+let rawText = `
+梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+`.replace(/[^\u4e00-\u9fff]/g, "");
 
-    playMonk(action) {
-        this.image.src = `./image/${action}.gif?${Date.now()}`;
-        setTimeout(() => this.image.src = "./image/idle.gif", 4000);
-    }
-};
+let rawText2 = `
+森羅萬象終歸壞唯有真空才不滅青色白色皆對待不落兩邊非生滅青色白色皆真性春風滿園露禪悅
+`.replace(/[^\u4e00-\u9fff]/g, "");
 
-// =============================
-// Timer
-// =============================
-const Timer = {
-    interval: null,
+let answer = `
+梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+森羅萬象終歸壞唯有真空才不滅
+梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+青色白色皆對待不落兩邊非生滅
+梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色
+青色白色皆真性春風滿園露禪悅
+`.replace(/[^\u4e00-\u9fff]/g, "");
 
-    start() {
-        UI.updateTimer(GameState.remainingSeconds);
-        this.interval = setInterval(() => {
-            GameState.remainingSeconds--;
-            UI.updateTimer(GameState.remainingSeconds);
+/* ========= Timer 函式 ========= */
 
-            if (GameState.remainingSeconds <= 0) {
-                this.stop();
-                GameFlow.end();
-            }
-        }, 1000);
-    },
 
-    stop() {
-        clearInterval(this.interval);
-    }
-};
+function updateTimerDisplay(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
 
-// =============================
-// Deck / Cards
-// =============================
-const Deck = {
-    pool: [],
-    cards: [],
+    document.getElementById("timer-min").textContent =
+        String(min).padStart(2, "0");
+    document.getElementById("timer-ms").textContent =
+        String(sec).padStart(2, "0");
+}
 
-    shuffle(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    },
+function startMainTimer() {
+    updateTimerDisplay(remainingSeconds);
 
-    buildPool(raw1, raw2) {
-        let pool = [];
-        raw1.split("").forEach(ch => {
-            for (let i = 0; i < 4; i++) pool.push(ch);
-        });
-        raw2.split("").forEach(ch => pool.push(ch));
-        this.pool = this.shuffle(pool.slice(0, GameConfig.TOTAL_CARDS));
-    },
+    timerInterval = setInterval(() => {
+        remainingSeconds--;
 
-    buildBoard(onClick) {
-        UI.grid.innerHTML = "";
-        UI.grid.style.gridTemplateColumns = `repeat(${GameConfig.COLS}, 1fr)`;
-
-        this.cards = [];
-        let num = 1;
-
-        this.pool.forEach(ch => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.dataset.char = ch;
-
-            card.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-face card-front">${ch}<br>${num}</div>
-                    <div class="card-face card-back">${num}</div>
-                </div>
-            `;
-
-            card.addEventListener("click", () => onClick(card));
-            UI.grid.appendChild(card);
-            this.cards.push(card);
-            num++;
-        });
-    },
-
-    preview(seconds) {
-        GameState.locked = true;
-        this.cards.forEach(c => c.classList.add("flip"));
-
-        setTimeout(() => {
-            this.cards.forEach(c => {
-                if (!c.classList.contains("matched")) c.classList.remove("flip");
-            });
-            GameState.locked = false;
-        }, seconds * 1000);
-    }
-};
-
-// =============================
-// HintSystem
-// =============================
-const HintSystem = {
-    init(answer) {
-        UI.hintBoard.innerHTML = "";
-        for (let i = 0; i < GameConfig.MAX_HINTS; i++) {
-            const cell = document.createElement("div");
-            cell.className = "hint-cell";
-            cell.textContent = answer[i] || "";
-            UI.hintBoard.appendChild(cell);
-        }
-    },
-
-    update(answer) {
-        [...UI.hintBoard.children].forEach((cell, i) => {
-            cell.textContent = answer[GameState.step + i] || "";
-            cell.classList.toggle("current", i === GameState.step % GameConfig.MAX_HINTS);
-        });
-    }
-};
-
-// =============================
-// Scoring
-// =============================
-const Scoring = {
-    correct() {
-        GameState.combo++;
-        const gain = GameConfig.SCORE_BASE + GameState.combo * GameConfig.SCORE_COMBO;
-        GameState.score += gain;
-        UI.showScorePopup(`+${gain}`, "plus");
-        UI.updateScore(GameState.score);
-    },
-
-    mistake() {
-        GameState.combo = 0;
-        GameState.mistakes++;
-        GameState.score = Math.max(0, GameState.score - 5);
-        UI.showScorePopup("-5", "minus");
-        UI.updateScore(GameState.score);
-    },
-
-    calculateBonus() {
-        let bonus = 0;
-        if (GameState.mistakes === 0) bonus += 100;
-        bonus += Math.floor(GameState.remainingSeconds / 10) * 2;
-        bonus -= GameState.usedHints * 10;
-        return Math.max(0, bonus);
-    }
-};
-
-// =============================
-// GameFlow
-// =============================
-const GameFlow = {
-    answer: "",
-
-    start() {
-        GameState.started = true;
-        Timer.start();
-        Deck.preview(GameConfig.INITIAL_PREVIEW);
-        HintSystem.update(this.answer);
-        UI.hintBtn.textContent = "再看一次";
-    },
-
-    end() {
-        if (GameState.finished) return;
-        GameState.finished = true;
-
-        Timer.stop();
-        GameState.bonus = Scoring.calculateBonus();
-        GameState.finalScore = GameState.score + GameState.bonus;
-
-        setTimeout(() => this.showResult(), 800);
-    },
-
-    showResult() {
-        UI.result.classList.remove("hidden");
-        this.animate("base-score", GameState.score, 600);
-        setTimeout(() => this.animate("bonus-score", GameState.bonus, 600), 700);
-        setTimeout(() => this.animate("final-score", GameState.finalScore, 800), 1400);
-    },
-
-    animate(id, value, duration) {
-        const el = document.getElementById(id);
-        let start = 0;
-        let startTime = null;
-
-        function step(ts) {
-            if (!startTime) startTime = ts;
-            const p = Math.min((ts - startTime) / duration, 1);
-            el.textContent = Math.floor(start + value * p);
-            if (p < 1) requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-    }
-};
-
-// =============================
-// Initialization
-// =============================
-(function init() {
-    UI.gameScreen.classList.remove("hidden");
-    UI.result.classList.add("hidden");
-
-    const raw1 = `梨樹開花滿樹白滿園梨花白如雪片片雪花飛滿地今日滿園成青色`.replace(/[^\u4e00-\u9fff]/g, "");
-    const raw2 = `森羅萬象終歸壞唯有真空才不滅青色白色皆對待不落兩邊非生滅青色白色皆真性春風滿園露禪悅`.replace(/[^\u4e00-\u9fff]/g, "");
-    GameFlow.answer = (raw1 + raw1 + raw2).replace(/[^\u4e00-\u9fff]/g, "");
-
-    Deck.buildPool(raw1, raw2);
-    Deck.buildBoard(card => {
-        if (GameState.locked || card.classList.contains("matched")) return;
-
-        card.classList.add("flip");
-        GameState.locked = true;
-
-        if (card.dataset.char !== GameFlow.answer[GameState.step]) {
-            setTimeout(() => {
-                card.classList.remove("flip");
-                GameState.locked = false;
-            }, 600);
-            Scoring.mistake();
+        if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            updateTimerDisplay(0);
+            onGameTimeEnd();
             return;
         }
 
-        card.classList.add("matched");
-        GameState.step++;
-        Scoring.correct();
-        UI.updateProgress(GameState.step);
-        HintSystem.update(GameFlow.answer);
-        UI.playMonk("correct");
+        updateTimerDisplay(remainingSeconds);
+    }, 1000);
+}
 
-        GameState.locked = false;
-        if (GameState.step >= GameFlow.answer.length) GameFlow.end();
+function onGameTimeEnd() {
+    gameFinished = true;
+    lockBoard = true;
+    showResult();
+}
+
+/* ========= 工具 ========= */
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function showScorePopup(text, type = "plus") {
+    const board = document.getElementById("info-box");
+
+    const popup = document.createElement("div");
+    popup.className = `score-popup ${type}`;
+    popup.textContent = text;
+
+    board.appendChild(popup);
+
+    setTimeout(() => {
+        popup.remove();
+    }, 1200);
+}
+
+function animateNumber(el, start, end, duration = 800) {
+    let startTime = null;
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = Math.min((timestamp - startTime) / duration, 1);
+        el.textContent = Math.floor(start + (end - start) * progress);
+        if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+}
+
+/* ========= 建立牌組 ========= */
+function buildCardPool() {
+    let pool = [];
+    rawText.split("").forEach(ch => {
+        for (let i = 0; i < 4; i++) pool.push(ch);
     });
+    rawText2.split("").forEach(ch => pool.push(ch));
+    pool = pool.slice(0, TOTAL_CARDS);
+    return shuffle(pool);
+}
 
-    HintSystem.init(GameFlow.answer);
+/* ========= Hint Board ========= */
+function initHintBoard() {
+    hintBoard.innerHTML = "";
+    for (let i = 0; i < MAX_HINTS; i++) {
+        const cell = document.createElement("div");
+        cell.className = "hint-cell";
+        cell.textContent = answer[step + i] || "";
+        hintBoard.appendChild(cell);
+    }
+}
 
-    UI.hintBtn.addEventListener("click", () => {
-        if (!GameState.started) GameFlow.start();
-        else {
-            GameState.usedHints++;
-            Deck.preview(15);
+function renewHintBoard() {
+    const cells = hintBoard.children;
+    if (step % MAX_HINTS === 0) {
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].textContent = answer[step + i] || "";
+            if(i == 0){
+                if(step != 0){
+                    cells[MAX_HINTS-1].classList.remove("current");
+                }
+                cells[i].classList.add("current");
+                
+            }
         }
+    }else{
+        cells[step % MAX_HINTS-1].classList.remove("current");
+        cells[step % MAX_HINTS].classList.add("current");
+    }
+}
+
+/* ========= 建立卡牌 ========= */
+function buildBoard() {
+    grid.innerHTML = "";
+    grid.style.gridTemplateColumns = `repeat(${TOTAL_COLS}, 1fr)`;
+
+    cardElements = [];
+    let num = 1;
+
+    cardPool.forEach((ch, idx) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.char = ch;
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        const front = document.createElement("div");
+        front.className = "card-face card-front";
+        front.textContent = `${ch}\n${num}`;
+
+        const back = document.createElement("div");
+        back.className = "card-face card-back";
+        back.textContent = num;
+
+        inner.append(front, back);
+        card.appendChild(inner);
+
+        card.addEventListener("click", () => onCardClick(card));
+
+        grid.appendChild(card);
+        cardElements.push(card);
+        num++;
     });
-})();
+}
+
+/* ========= 遊戲邏輯 ========= */
+function previewAll(seconds) {
+    lockBoard = true;
+    cardElements.forEach(c => c.classList.add("flip"));
+
+    setTimeout(() => {
+        cardElements.forEach(c => {
+            if (!c.classList.contains("matched")) c.classList.remove("flip");
+        });
+        lockBoard = false;
+    }, seconds * 1000);
+}
+
+function playCorrectGif() {
+    image.src = "./image/correct.gif?" + Date.now();
+    setTimeout(() => image.src = "./image/idle.gif", 4000);
+}
+
+function checkSequence(card) {
+    return card.dataset.char === answer[step];
+}
+
+function onCardClick(card) {
+    if (lockBoard || card.classList.contains("matched")) return;
+
+    lockBoard = true;
+    card.classList.add("flip");
+
+    if (!checkSequence(card)) {
+        setTimeout(() => {
+            card.classList.remove("flip");
+            lockBoard = false;
+        }, 600);
+        combo = 0;
+        mistakeCount++;
+        score = Math.max(0, score - 2);
+        showScorePopup(`-2`, "minus");
+
+        scoreBoard.textContent = score;
+        return;
+    }
+
+    card.classList.add("matched");
+
+    combo++;
+    const gain = 10 + combo * 2;
+    score += gain;
+    showScorePopup(`+${gain}`, "plus");
+
+    step++;
+
+    playCorrectGif();
+    renewHintBoard();
+
+    scoreBoard.textContent = score;
+    progress.textContent = step;
+
+    lockBoard = false;
+
+    if (score === TOTAL_CARDS) {
+        alert("🎉 恭喜全部完成！");
+        gameFinished = true;
+    }
+}
+
+/* ========= 提示 ========= */
+function useHint() {
+    if (hintRemaining <= 0) {
+        alert("提示次數已用完！");
+        return;
+    }
+
+    hintRemaining--;
+    hintBtn.innerHTML =
+        `再看一次（剩餘 ${hintRemaining} 次）`;
+
+    previewAll(15); // 只翻牌，不碰 timer
+}
+
+/* ========= 開始遊戲 ========= */
+function startGame() {
+    gameStarted = true;
+    gameFinished = false;
+
+    startMainTimer();          // ⭐ 只在這裡開 timer
+    previewAll(initialPeekSeconds);
+    renewHintBoard();
+
+    hintBtn.innerHTML =
+        `再看一次（剩餘 ${hintRemaining} 次）`;
+}
+
+function showResult() {
+    document.getElementById("result-screen").classList.remove("hidden");
+
+    animateNumber(
+        document.getElementById("base-score"),
+        0,
+        score,
+        600
+    );
+
+    setTimeout(() => {
+        animateNumber(
+            document.getElementById("bonus-score"),
+            0,
+            bonus,
+            600
+        );
+    }, 700);
+
+    setTimeout(() => {
+        animateNumber(
+            document.getElementById("final-score"),
+            0,
+            finalScore,
+            800
+        );
+    }, 1500);
+}
+
+/* ========= 事件 ========= */
+hintBtn.addEventListener("click", () => {
+    if (!gameStarted) startGame();
+    else if (!gameFinished) useHint();
+});
+
+/* ========= 初始化 ========= */
+gameScreen.classList.remove("hidden");
+result.classList.add("hidden");
+
+cardPool = buildCardPool();
+buildBoard();
+initHintBoard();
+
+幫我生成完整版
