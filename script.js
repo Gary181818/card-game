@@ -8,7 +8,7 @@ const TOTAL_COLS = 14;
 const TOTAL_CARDS = TOTAL_ROWS * TOTAL_COLS; // 154
 const MAX_HINTS = 14;
 
-const NORMAL_TIME = 20 * 60 // 20 分鐘
+const NORMAL_TIME = 15 * 60 // 15 分鐘
 const HINT_TIME = 10;        // 10 秒
 const INITIAL_PREVIEW = 15;  // 開局偷看 15 秒
 
@@ -30,8 +30,7 @@ let lockBoard = true;
 let score = 0;
 let bonus = 0;
 
-
-let finalScore = score + bonus;
+let finalScore = 0;
 
 let combo = 0;
 let usedHints = 0;
@@ -45,7 +44,7 @@ let gameFinished = false;
 
 /* ========= Timer ========= */
 let timerInterval = null;
-let remainingSeconds = 20 * 60; // 20 分鐘
+let remainingSeconds = 15 * 60; // 15 分鐘
 let initialPeekSeconds = 15; // 開局偷看 15 秒
 
 /* ========= 題庫 ========= */
@@ -68,7 +67,6 @@ let answer = `
 `.replace(/[^\u4e00-\u9fff]/g, "");
 
 /* ========= Timer 函式 ========= */
-
 
 function updateTimerDisplay(seconds) {
     const min = Math.floor(seconds / 60);
@@ -100,6 +98,8 @@ function startMainTimer() {
 function onGameTimeEnd() {
     gameFinished = true;
     lockBoard = true;
+    bonus = calculateBonus();
+    finalScore = score + bonus;
     showResult();
 }
 
@@ -110,6 +110,17 @@ function shuffle(arr) {
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
+}
+
+function calculateBonus() {
+    const timeBonus = Math.floor(remainingSeconds * 2);   // 時間越多越高
+    const comboBonus = combo * combo * 5;                 // 連擊平方成長
+    const mistakePenalty = mistakeCount * 20;             // 錯誤懲罰
+
+    return Math.max(
+        0,
+        timeBonus + comboBonus - mistakePenalty
+    );
 }
 
 function showScorePopup(text, type = "plus") {
@@ -138,6 +149,11 @@ function animateNumber(el, start, end, duration = 800) {
 
     requestAnimationFrame(step);
 }
+/* ========= 對話 ========= */
+function message(text){
+    document.getElementById("dialogue-box").textContent = text;
+}
+
 
 /* ========= 建立牌組 ========= */
 function buildCardPool() {
@@ -248,6 +264,7 @@ function onCardClick(card) {
             card.classList.remove("flip");
             lockBoard = false;
         }, 600);
+        message("答錯了！ 哭哭～");
         combo = 0;
         mistakeCount++;
         score = Math.max(0, score - 2);
@@ -258,7 +275,7 @@ function onCardClick(card) {
     }
 
     card.classList.add("matched");
-
+    message("恭喜你，答錯了！");
     combo++;
     const gain = 10 + combo * 2;
     score += gain;
@@ -276,7 +293,7 @@ function onCardClick(card) {
 
     if (score === TOTAL_CARDS) {
         alert("🎉 恭喜全部完成！");
-        gameFinished = true;
+        onGameTimeEnd();
     }
 }
 
@@ -350,4 +367,3 @@ cardPool = buildCardPool();
 buildBoard();
 initHintBoard();
 
-幫我生成完整版
