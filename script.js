@@ -151,7 +151,7 @@ function animateNumber(el, start, end, duration = 800) {
 }
 /* ========= 對話 ========= */
 function message(text){
-    document.getElementById("dialogue-box").textContent = text;
+    document.getElementById("dialog-box").textContent = text;
 }
 
 
@@ -264,7 +264,7 @@ function onCardClick(card) {
             card.classList.remove("flip");
             lockBoard = false;
         }, 600);
-        message("答錯了！ 哭哭～");
+        message("答錯了！再試一次。");
         combo = 0;
         mistakeCount++;
         score = Math.max(0, score - 2);
@@ -275,7 +275,7 @@ function onCardClick(card) {
     }
 
     card.classList.add("matched");
-    message("恭喜你，答錯了！");
+    message("恭喜你，答對了！");
     combo++;
     const gain = 10 + combo * 2;
     score += gain;
