@@ -8,7 +8,7 @@ const TOTAL_COLS = 14;
 const TOTAL_CARDS = TOTAL_ROWS * TOTAL_COLS; // 154
 const MAX_HINTS = 14;
 
-const NORMAL_TIME = 10 * 60 // 15 分鐘
+const NORMAL_TIME = 12 * 60 // 15 分鐘
 const HINT_TIME = 10;        // 10 秒
 const INITIAL_PREVIEW = 15;  // 開局偷看 15 秒
 
@@ -45,7 +45,7 @@ let gameFinished = false;
 
 /* ========= Timer ========= */
 let timerInterval = null;
-let remainingSeconds = 10 * 60; // 15 分鐘
+let remainingSeconds = 12 * 60; // 15 分鐘
 let initialPeekSeconds = 15; // 開局偷看 15 秒
 
 /* ========= 題庫 ========= */
