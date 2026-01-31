@@ -33,6 +33,7 @@ let bonus = 0;
 let finalScore = 0;
 
 let combo = 0;
+let comboCount=0;
 let usedHints = 0;
 let mistakeCount = 0;
 
@@ -113,13 +114,12 @@ function shuffle(arr) {
 }
 
 function calculateBonus() {
-    const timeBonus = Math.floor(remainingSeconds * 2);   // 時間越多越高
-    const comboBonus = combo * combo * 5;                 // 連擊平方成長
+    const comboBonus = comboCount * comboCount * 5;                 // 連擊平方成長
     const mistakePenalty = mistakeCount * 20;             // 錯誤懲罰
 
     return Math.max(
         0,
-        timeBonus + comboBonus - mistakePenalty
+        comboBonus - mistakePenalty
     );
 }
 
@@ -265,6 +265,7 @@ function onCardClick(card) {
             lockBoard = false;
         }, 600);
         message("答錯了！再試一次。");
+        if(combo > 0) comboCount++;
         combo = 0;
         mistakeCount++;
         score = Math.max(0, score - 2);
